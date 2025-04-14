@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: time-bot
+
+server:
+  port: 8090
+
+telegram:
+  token:
