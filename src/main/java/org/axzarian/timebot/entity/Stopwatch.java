@@ -18,6 +18,10 @@ public class Stopwatch {
         this.startTime = Instant.now();
     }
 
+    public void setStartTime(Instant time) {
+        this.startTime = time;
+    }
+
     public String formatUptime() {
         long totalSeconds = this.getTime();
 
