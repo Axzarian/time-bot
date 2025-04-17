@@ -20,7 +20,7 @@ public class TelegramWebhookController {
     private final TelegramSender telegramSender;
     private final Stopwatch stopwatch;
 
-    private static final String IVAN_ID = "97938429";
+    private static final String IVAN_ID = "";
     private static final String MY_ID = "1065966054";
 
 
