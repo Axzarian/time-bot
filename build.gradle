@@ -23,6 +23,14 @@ repositories {
     mavenCentral()
 }
 
+bootJar {
+    archiveFileName = "time-bot.jar"
+}
+
+jar {
+    enabled = false
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 

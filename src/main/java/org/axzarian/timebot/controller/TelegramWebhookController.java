@@ -21,30 +21,32 @@ public class TelegramWebhookController {
     private final Stopwatch stopwatch;
 
     private static final String IVAN_ID = "97938429";
-    private static final String MY_ID = "9793842sd9";
+    private static final String MY_ID = "1065966054";
 
 
     @PostMapping
     public ResponseEntity<String> onUpdateReceived(@RequestBody Update update) {
 
-        if ("/start".equals(update.getMessage().getText())) {
-            log.info("Get update: {}", update);
-        }
+        var validUser = true;
 
         if (update.hasMessage() && update.getMessage().hasText()) {
 
+            validUser = isValidUser(update.getMessage().getFrom().getId());
+
+            if ("/start".equals(update.getMessage().getText())) {
+                log.info("Get update: {}", update);
+            }
+
             final var text = update.getMessage().getText();
             final var chatId = update.getMessage().getChatId();
-            final var userId = update.getMessage().getFrom().getId();
 
-            if ("/time".equals(text) && (IVAN_ID.equals(userId) || MY_ID.equals(chatId))) {
+            if ("/time".equals(text) && validUser) {
                 final var message = getMessage();
                 telegramSender.sendWithButtonsForIvan(chatId.toString(), message);
             } else if ("/time".equals(text)) {
                 final var message = getMessage();
                 telegramSender.sendWithButtons(chatId.toString(), message);
             }
-
         }
 
         if (update.hasCallbackQuery()) {
@@ -52,9 +54,16 @@ public class TelegramWebhookController {
             final var chatId = update.getCallbackQuery().getMessage().getChatId();
             final var messageId = update.getCallbackQuery().getMessage().getMessageId();
 
-            if ("refresh".equals(data)) {
+            if ("refresh".equals(data) && validUser ) {
+                final var message = getMessage();
+                telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
+            } else if ("refresh".equals(data)) {
                 final var message = getMessage();
                 telegramSender.editMessage(chatId.toString(), messageId, message);
+            } else if ("reset".equals(data) && validUser) {
+                stopwatch.reset();
+                final var message = getMessage();
+                telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
             } else if ("reset".equals(data)) {
                 stopwatch.reset();
                 final var message = getMessage();
@@ -62,6 +71,13 @@ public class TelegramWebhookController {
             }
         }
         return ResponseEntity.ok("OK");
+    }
+
+    private boolean isValidUser(Long userId) {
+        if (MY_ID.equals(userId.toString())) {
+            return true;
+        }
+        return IVAN_ID.equals(userId.toString());
     }
 
     private String getMessage() {
