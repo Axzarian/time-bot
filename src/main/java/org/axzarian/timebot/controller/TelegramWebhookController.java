@@ -1,6 +1,7 @@
 package org.axzarian.timebot.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.axzarian.timebot.entity.Stopwatch;
 import org.axzarian.timebot.sender.TelegramSender;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+@Slf4j
 @RestController
 @RequestMapping("/telegram")
 @RequiredArgsConstructor
@@ -18,18 +20,31 @@ public class TelegramWebhookController {
     private final TelegramSender telegramSender;
     private final Stopwatch stopwatch;
 
+    private static final String IVAN_ID = "97938429";
+    private static final String MY_ID = "9793842sd9";
+
 
     @PostMapping
     public ResponseEntity<String> onUpdateReceived(@RequestBody Update update) {
+
+        if ("/start".equals(update.getMessage().getText())) {
+            log.info("Get update: {}", update);
+        }
 
         if (update.hasMessage() && update.getMessage().hasText()) {
 
             final var text = update.getMessage().getText();
             final var chatId = update.getMessage().getChatId();
+            final var userId = update.getMessage().getFrom().getId();
 
-            if ("/time".equals(text)) {
-                telegramSender.sendWithButtons(chatId.toString(), stopwatch.formatUptime());
+            if ("/time".equals(text) && (IVAN_ID.equals(userId) || MY_ID.equals(chatId))) {
+                final var message = getMessage();
+                telegramSender.sendWithButtonsForIvan(chatId.toString(), message);
+            } else if ("/time".equals(text)) {
+                final var message = getMessage();
+                telegramSender.sendWithButtons(chatId.toString(), message);
             }
+
         }
 
         if (update.hasCallbackQuery()) {
@@ -38,9 +53,18 @@ public class TelegramWebhookController {
             final var messageId = update.getCallbackQuery().getMessage().getMessageId();
 
             if ("refresh".equals(data)) {
-                telegramSender.editMessage(chatId.toString(), messageId, stopwatch.formatUptime());
+                final var message = getMessage();
+                telegramSender.editMessage(chatId.toString(), messageId, message);
+            } else if ("reset".equals(data)) {
+                stopwatch.reset();
+                final var message = getMessage();
+                telegramSender.editMessage(chatId.toString(), messageId, message);
             }
         }
         return ResponseEntity.ok("OK");
+    }
+
+    private String getMessage() {
+        return "Газелька бегает без ремонта уже: %n%n %s ".formatted(stopwatch.formatUptime());
     }
 }

@@ -33,6 +33,29 @@ public class TelegramSender {
         restTemplate.postForObject(url, payload, String.class);
     }
 
+
+    public void sendWithButtonsForIvan(String chatId, String text) {
+        final var url = String.format("https://api.telegram.org/bot%s/sendMessage", botToken);
+
+        Map<String, Object> keyboard = Map.of(
+                "inline_keyboard", List.of(
+                        List.of(
+                                Map.of("text", "⏱ Обновить", "callback_data", "refresh"),
+                                Map.of("text", "❌Обнулить", "callback_data", "reset")
+                        )
+                )
+        );
+
+        Map<String, Object> payload = Map.of(
+                "chat_id", chatId,
+                "text", text,
+                "reply_markup", keyboard
+        );
+
+        restTemplate.postForObject(url, payload, String.class);
+
+    }
+
     public void editMessage(String chatId, Integer messageId, String newText) {
         final var url = String.format("https://api.telegram.org/bot%s/editMessageText", botToken);
 
