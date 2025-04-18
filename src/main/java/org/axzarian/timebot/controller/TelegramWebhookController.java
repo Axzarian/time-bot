@@ -27,6 +27,26 @@ public class TelegramWebhookController {
     @PostMapping
     public ResponseEntity<String> onUpdateReceived(@RequestBody Update update) {
 
+        /*
+            1. Получаем юзера из Update и если такого нет сохраняем в базу/файлик
+               Можно создать UserService, UserRepo.
+
+            2. Проверяем что это за юзер если Иван или я то доступны другие кнопки
+               UserValidationService
+
+            3. UpdateService в нем происходит обработка запрос на хук.
+               Меотды getMessage(), getChatId(), getUserId()
+
+            4. CallbackService для обработки запросов с колбэками
+               Методы getCallbackData(), getCallbackChatId(), getCallbackMessageId()
+
+            5. Sender без сообщений абстрактный
+
+            6. Класс с константами урлов для отправки, изменения сообщений. Для сообщений с фото, видео и т.д.
+
+         */
+
+
         var validUser = true;
 
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -54,7 +74,7 @@ public class TelegramWebhookController {
             final var chatId = update.getCallbackQuery().getMessage().getChatId();
             final var messageId = update.getCallbackQuery().getMessage().getMessageId();
 
-            if ("refresh".equals(data) && validUser ) {
+            if ("refresh".equals(data) && validUser) {
                 final var message = getMessage();
                 telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
             } else if ("refresh".equals(data)) {
