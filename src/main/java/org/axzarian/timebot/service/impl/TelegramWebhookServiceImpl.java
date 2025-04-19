@@ -50,7 +50,7 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
                 case "refresh" -> telegramClient.editMessage(chatId, messageId, stopwatch.formatUptime());
                 case "reset" -> {
 
-                    var messsage = "Вы не можете обнулить таймер";
+                    var messsage = "Вы не можете обнулить таймер%n%n%s".formatted(stopwatch.formatUptime());
 
                     if (specialUserChecker.isSpecial(senderId)) {
                         stopwatch.reset();
