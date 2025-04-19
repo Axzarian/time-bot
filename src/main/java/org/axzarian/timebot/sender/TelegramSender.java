@@ -1,7 +1,6 @@
 package org.axzarian.timebot.sender;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,13 +11,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TelegramSender {
 
-    @Value("${telegram.token}")
-    private static       String botToken;
-
-    private static final String SEND_MESSAGE_URL = "https://api.telegram.org/bot%s/sendMessage".formatted(botToken);
-    private static final String EDIT_MESSAGE_URL = "https://api.telegram.org/bot%s/editMessageText".formatted(botToken);
-
     private final RestTemplate telegramRestTemplate;
+
+    private static final String SEND_MESSAGE_URL = "/sendMessage";
+    private static final String EDIT_MESSAGE_URL = "/editMessageText";
 
 
     public void sendWithButtons(String chatId, String text) {
@@ -61,6 +57,5 @@ public class TelegramSender {
 
         telegramRestTemplate.postForObject(EDIT_MESSAGE_URL, payload, String.class);
     }
-
 
 }
