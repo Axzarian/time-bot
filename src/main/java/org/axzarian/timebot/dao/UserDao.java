@@ -1,7 +1,7 @@
 package org.axzarian.timebot.dao;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.axzarian.timebot.model.entity.User;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -44,12 +44,11 @@ public class UserDao {
                          user_name = excluded.user_name
                      """;
 
-        Map<String, Object> params = Map.of(
-            "telegramId", user.getTelegramId(),
-            "firstName", user.getFirstName(),
-            "lastName", user.getLastName(),
-            "userName", user.getUserName()
-        );
+        final var params = new HashMap<String, Object>();
+        params.put("telegramId", user.getTelegramId());
+        params.put("firstName", user.getFirstName());
+        params.put("lastName", user.getLastName());
+        params.put("userName", user.getUserName());
 
         namedParameterJdbcTemplate.update(sql, params);
     }
