@@ -1,20 +1,20 @@
 package org.axzarian.timebot.sender;
 
 import lombok.RequiredArgsConstructor;
+import org.axzarian.timebot.configuartion.TelegramProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @RequiredArgsConstructor
-public class TelegramSender {
+public class TelegramClient {
 
-    private final RestTemplate telegramRestTemplate;
-
-    private static final String SEND_MESSAGE_URL = "/sendMessage";
-    private static final String EDIT_MESSAGE_URL = "/editMessageText";
+    private final RestTemplate       telegramRestTemplate;
+    private final TelegramProperties telegramProperties;
 
 
     public void sendWithButtons(String chatId, String text) {
@@ -34,8 +34,9 @@ public class TelegramSender {
             "reply_markup", keyboard
         );
 
-        telegramRestTemplate.postForObject(SEND_MESSAGE_URL, payload, String.class);
+        final var url = buildUrl("sendMessage");
 
+        telegramRestTemplate.postForObject(url, payload, String.class);
     }
 
     public void editMessage(String chatId, Integer messageId, String newText) {
@@ -55,7 +56,18 @@ public class TelegramSender {
             "reply_markup", keyboard
         );
 
-        telegramRestTemplate.postForObject(EDIT_MESSAGE_URL, payload, String.class);
+        final var url = buildUrl("editMessageText");
+
+        telegramRestTemplate.postForObject(url, payload, String.class);
+    }
+
+    private String buildUrl(String method) {
+        return UriComponentsBuilder.newInstance()
+                                   .scheme("https")
+                                   .host("api.telegram.org")
+                                   .pathSegment("bot" + telegramProperties.getToken(), method)
+                                   .build()
+                                   .toUriString();
     }
 
 }

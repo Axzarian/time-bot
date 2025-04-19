@@ -3,7 +3,7 @@ package org.axzarian.timebot.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.axzarian.timebot.model.domain.Stopwatch;
-import org.axzarian.timebot.sender.TelegramSender;
+import org.axzarian.timebot.sender.TelegramClient;
 import org.axzarian.timebot.service.TelegramUpdateService;
 import org.axzarian.timebot.service.TelegramWebhookService;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class TelegramWebhookServiceImpl implements TelegramWebhookService {
 
     private final TelegramUpdateService telegramUpdateService;
-    private final TelegramSender        telegramSender;
+    private final TelegramClient        telegramClient;
     private final Stopwatch             stopwatch;
 
 
@@ -24,13 +24,13 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
 
         if (telegramUpdateService.hasTextMessage(update)) {
 
-            final var chatId   = telegramUpdateService.getMessageChatId(update);
+            final var chatId   = telegramUpdateService.getMessageChatId(update).toString();
             final var text     = telegramUpdateService.getMessageText(update);
             final var senderId = telegramUpdateService.getMessageSenderId(update);
 
             switch (text) {
                 case "/start" -> log.info("Update: {}", update);
-                case "/time" -> telegramSender.sendWithButtons(chatId.toString(), stopwatch.formatUptime());
+                case "/time" -> telegramClient.sendWithButtons(chatId, stopwatch.formatUptime());
             }
         }
 
@@ -41,8 +41,8 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
             final var messageId = telegramUpdateService.getCallbackMessageId(update);
 
             switch (data) {
-                case "refresh" -> telegramSender.editMessage(chatId, messageId, stopwatch.formatUptime());
-                case "reset" -> { stopwatch.reset(); telegramSender.editMessage(chatId, messageId, stopwatch.formatUptime());
+                case "refresh" -> telegramClient.editMessage(chatId, messageId, stopwatch.formatUptime());
+                case "reset" -> { stopwatch.reset(); telegramClient.editMessage(chatId, messageId, stopwatch.formatUptime());
                 }
             }
 
