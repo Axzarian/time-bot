@@ -3,7 +3,6 @@ package org.axzarian.timebot.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.axzarian.timebot.model.domain.Stopwatch;
-import org.axzarian.timebot.sender.TelegramSender;
 import org.axzarian.timebot.service.TelegramWebhookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +17,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class TelegramWebhookController {
 
-    private final TelegramSender         telegramSender;
     private final Stopwatch              stopwatch;
     private final TelegramWebhookService webhookService;
 
@@ -73,35 +71,28 @@ public class TelegramWebhookController {
 //            }
 //        }
 
-        if (update.hasCallbackQuery()) {
-            final var data      = update.getCallbackQuery().getData();
-            final var chatId    = update.getCallbackQuery().getMessage().getChatId();
-            final var messageId = update.getCallbackQuery().getMessage().getMessageId();
-
-            if ("refresh".equals(data) && validUser) {
-                final var message = getMessage();
-                telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
-            } else if ("refresh".equals(data)) {
-                final var message = getMessage();
-                telegramSender.editMessage(chatId.toString(), messageId, message);
-            } else if ("reset".equals(data) && validUser) {
-                stopwatch.reset();
-                final var message = getMessage();
-                telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
-            } else if ("reset".equals(data)) {
-                stopwatch.reset();
-                final var message = getMessage();
-                telegramSender.editMessage(chatId.toString(), messageId, message);
-            }
-        }
+//        if (update.hasCallbackQuery()) {
+//            final var data      = update.getCallbackQuery().getData();
+//            final var chatId    = update.getCallbackQuery().getMessage().getChatId();
+//            final var messageId = update.getCallbackQuery().getMessage().getMessageId();
+//
+//            if ("refresh".equals(data) && validUser) {
+//                final var message = getMessage();
+//                telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
+//            } else if ("refresh".equals(data)) {
+//                final var message = getMessage();
+//                telegramSender.editMessage(chatId.toString(), messageId, message);
+//            } else if ("reset".equals(data) && validUser) {
+//                stopwatch.reset();
+//                final var message = getMessage();
+//                telegramSender.editMessageForIvan(chatId.toString(), messageId, message);
+//            } else if ("reset".equals(data)) {
+//                stopwatch.reset();
+//                final var message = getMessage();
+//                telegramSender.editMessage(chatId.toString(), messageId, message);
+//            }
+//        }
         return ResponseEntity.ok("OK");
-    }
-
-    private boolean isValidUser(Long userId) {
-        if (MY_ID.equals(userId.toString())) {
-            return true;
-        }
-        return IVAN_ID.equals(userId.toString());
     }
 
     private String getMessage() {

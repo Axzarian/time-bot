@@ -16,12 +16,12 @@ public class UserDao {
     private final RowMapper<UserDto> userMapper = BeanPropertyRowMapper.newInstance(UserDto.class);
 
     public List<UserDto> findAll() {
-        return jdbcTemplate.query("SELECT * FROM user", userMapper);
+        return jdbcTemplate.query("SELECT * FROM users", userMapper);
     }
 
     public void save(UserDto userDto) {
         jdbcTemplate.update(
-            "INSERT INTO user (telegram_id, first_name, last_name, user_name) VALUES (?, ?, ?, ?) ",
+            "INSERT INTO users (telegram_id, first_name, last_name, user_name) VALUES (?, ?, ?, ?) ",
             userDto.getTelegramId(), userDto.getFirstName(), userDto.getLastName(), userDto.getUserName()
         );
     }

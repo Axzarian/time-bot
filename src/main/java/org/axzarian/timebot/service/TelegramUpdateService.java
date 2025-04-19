@@ -11,4 +11,10 @@ public interface TelegramUpdateService {
     String getMessageText(Update update);
 
     Long getMessageChatId(Update update);
+
+    String getCallbackData(Update update);
+
+    Long getCallbackChatId(Update update);
+
+    Integer getCallbackMessageId(Update update);
 }
