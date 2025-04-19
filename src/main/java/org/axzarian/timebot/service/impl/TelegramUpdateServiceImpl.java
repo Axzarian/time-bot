@@ -42,5 +42,10 @@ public class TelegramUpdateServiceImpl implements TelegramUpdateService {
         return update.getCallbackQuery().getMessage().getMessageId();
     }
 
+    @Override
+    public Long getCallbackSenderId(Update update) {
+        return update.getCallbackQuery().getFrom().getId();
+    }
+
 
 }

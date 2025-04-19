@@ -1,5 +1,6 @@
 package org.axzarian.timebot.sender;
 
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.axzarian.timebot.configuartion.TelegramProperties;
 import org.axzarian.timebot.model.dto.TelegramMessageRequest;
@@ -21,9 +22,11 @@ public class TelegramClient {
     private final RestTemplate       telegramRestTemplate;
     private final TelegramProperties telegramProperties;
 
-    public void sendWithButtons(String chatId, String text) {
+    private static final List<String> specialIds = List.of("1065966054");
 
-        final var markup = getKeyboardMarkup();
+    public void sendWithButtons(String chatId, String senderId, String text) {
+
+        final var markup = getKeyboardMarkup(senderId);
         final var payload = TelegramMessageRequest.builder()
                                                   .chatId(chatId)
                                                   .text(text)
@@ -36,9 +39,9 @@ public class TelegramClient {
         telegramRestTemplate.postForObject(url, entity, String.class);
     }
 
-    public void editMessage(String chatId, Integer messageId, String newText) {
+    public void editMessage(String chatId, Integer messageId, String senderId, String newText) {
 
-        final var markup = getKeyboardMarkup();
+        final var markup = getKeyboardMarkup(senderId);
         final var payload = TelegramMessageRequest.builder()
                                                   .chatId(chatId)
                                                   .text(newText)
@@ -52,21 +55,32 @@ public class TelegramClient {
         telegramRestTemplate.postForObject(url, entity, String.class);
     }
 
-    private static InlineKeyboardMarkup getKeyboardMarkup() {
-        final var refreshButton = InlineKeyboardButton.builder()
-                                                      .text("⏱ Обновить")
-                                                      .callbackData("refresh")
-                                                      .build();
+    protected InlineKeyboardMarkup getKeyboardMarkup(String senderId) {
 
-        final var resetButtont = InlineKeyboardButton.builder()
-                                                     .text("❌ Обнулить")
-                                                     .callbackData("reset")
-                                                     .build();
+        final var firstRow = new ArrayList<InlineKeyboardButton>();
+        firstRow.add(getRefreshButton());
 
-        final var markup = InlineKeyboardMarkup.builder()
-                                               .keyboard(List.of(List.of(refreshButton, resetButtont)))
-                                               .build();
-        return markup;
+        if (specialIds.contains(senderId)) {
+            firstRow.add(getResetButtont());
+        }
+
+        return InlineKeyboardMarkup.builder()
+                            .keyboard(List.of(firstRow))
+                            .build();
+    }
+
+    private static InlineKeyboardButton getResetButtont() {
+        return InlineKeyboardButton.builder()
+                                   .text("❌ Обнулить")
+                                   .callbackData("reset")
+                                   .build();
+    }
+
+    private static InlineKeyboardButton getRefreshButton() {
+        return InlineKeyboardButton.builder()
+                                   .text("⏱ Обновить")
+                                   .callbackData("refresh")
+                                   .build();
     }
 
     private HttpEntity<TelegramMessageRequest> buildHttpRequest(TelegramMessageRequest telegramMessageRequest) {

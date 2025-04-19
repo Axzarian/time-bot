@@ -17,4 +17,6 @@ public interface TelegramUpdateService {
     Long getCallbackChatId(Update update);
 
     Integer getCallbackMessageId(Update update);
+
+    Long getCallbackSenderId(Update update);
 }
