@@ -30,7 +30,7 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
 
             switch (text) {
                 case "/start" -> log.info("Update: {}", update);
-                case "/time" -> telegramSender.sendWithButtonsForIvan(chatId.toString(), stopwatch.formatUptime());
+                case "/time" -> telegramSender.sendWithButtons(chatId.toString(), stopwatch.formatUptime());
             }
         }
 
@@ -41,8 +41,8 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
             final var messageId = telegramUpdateService.getCallbackMessageId(update);
 
             switch (data) {
-                case "refresh" -> telegramSender.editMessageForIvan(chatId, messageId, stopwatch.formatUptime());
-                case "reset" -> { stopwatch.reset(); telegramSender.editMessageForIvan(chatId, messageId, stopwatch.formatUptime());
+                case "refresh" -> telegramSender.editMessage(chatId, messageId, stopwatch.formatUptime());
+                case "reset" -> { stopwatch.reset(); telegramSender.editMessage(chatId, messageId, stopwatch.formatUptime());
                 }
             }
 
