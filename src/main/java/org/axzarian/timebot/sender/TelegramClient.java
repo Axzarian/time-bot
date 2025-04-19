@@ -23,58 +23,50 @@ public class TelegramClient {
 
     public void sendWithButtons(String chatId, String text) {
 
-        final var refreshButton = InlineKeyboardButton.builder()
-                                                      .text("⏱ Обновить")
-                                                      .callbackData("refresh")
-                                                      .build();
-
-        final var resetButtont = InlineKeyboardButton.builder()
-                                                     .text("❌ Обнулить")
-                                                     .callbackData("reset")
-                                                     .build();
-
-        final var markup = InlineKeyboardMarkup.builder()
-                                               .keyboard(List.of(List.of(refreshButton, resetButtont)))
-                                               .build();
-
-        final var request = TelegramMessageRequest.builder()
+        final var markup = getKeyboardMarkup();
+        final var payload = TelegramMessageRequest.builder()
                                                   .chatId(chatId)
                                                   .text(text)
                                                   .replyMarkup(markup)
                                                   .build();
 
-        final var payload = buildHttpRequest(request);
-        final var url     = buildUrl("sendMessage");
+        final var entity = buildHttpRequest(payload);
+        final var url    = buildUrl("sendMessage");
 
-        telegramRestTemplate.postForObject(url, payload, String.class);
+        telegramRestTemplate.postForObject(url, entity, String.class);
     }
 
     public void editMessage(String chatId, Integer messageId, String newText) {
-        final var refreshButton = InlineKeyboardButton.builder()
-                                                      .text("⏱ Обновить")
-                                                      .callbackData("refresh")
-                                                      .build();
 
-        final var resetButtont = InlineKeyboardButton.builder()
-                                                     .text("❌ Обнулить")
-                                                     .callbackData("reset")
-                                                     .build();
-
-        final var markup = InlineKeyboardMarkup.builder()
-                                               .keyboard(List.of(List.of(refreshButton, resetButtont)))
-                                               .build();
-
-        final var request = TelegramMessageRequest.builder()
+        final var markup = getKeyboardMarkup();
+        final var payload = TelegramMessageRequest.builder()
                                                   .chatId(chatId)
                                                   .text(newText)
                                                   .messageId(messageId)
                                                   .replyMarkup(markup)
                                                   .build();
 
-        final var payload = buildHttpRequest(request);
-        final var url     = buildUrl("editMessageText");
+        final var entity = buildHttpRequest(payload);
+        final var url    = buildUrl("editMessageText");
 
-        telegramRestTemplate.postForObject(url, payload, String.class);
+        telegramRestTemplate.postForObject(url, entity, String.class);
+    }
+
+    private static InlineKeyboardMarkup getKeyboardMarkup() {
+        final var refreshButton = InlineKeyboardButton.builder()
+                                                      .text("⏱ Обновить")
+                                                      .callbackData("refresh")
+                                                      .build();
+
+        final var resetButtont = InlineKeyboardButton.builder()
+                                                     .text("❌ Обнулить")
+                                                     .callbackData("reset")
+                                                     .build();
+
+        final var markup = InlineKeyboardMarkup.builder()
+                                               .keyboard(List.of(List.of(refreshButton, resetButtont)))
+                                               .build();
+        return markup;
     }
 
     private HttpEntity<TelegramMessageRequest> buildHttpRequest(TelegramMessageRequest telegramMessageRequest) {
