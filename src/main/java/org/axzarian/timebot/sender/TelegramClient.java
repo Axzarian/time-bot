@@ -1,6 +1,5 @@
 package org.axzarian.timebot.sender;
 
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.axzarian.timebot.configuartion.TelegramProperties;
 import org.axzarian.timebot.model.dto.TelegramMessageRequest;
@@ -26,7 +25,7 @@ public class TelegramClient {
 
     public void sendWithButtons(String chatId, String senderId, String text) {
 
-        final var markup = getKeyboardMarkup(senderId);
+        final var markup = getKeyboardMarkup();
         final var payload = TelegramMessageRequest.builder()
                                                   .chatId(chatId)
                                                   .text(text)
@@ -41,7 +40,7 @@ public class TelegramClient {
 
     public void editMessage(String chatId, Integer messageId, String senderId, String newText) {
 
-        final var markup = getKeyboardMarkup(senderId);
+        final var markup = getKeyboardMarkup();
         final var payload = TelegramMessageRequest.builder()
                                                   .chatId(chatId)
                                                   .text(newText)
@@ -55,18 +54,17 @@ public class TelegramClient {
         telegramRestTemplate.postForObject(url, entity, String.class);
     }
 
-    protected InlineKeyboardMarkup getKeyboardMarkup(String senderId) {
+    protected InlineKeyboardMarkup getKeyboardMarkup() {
 
-        final var firstRow = new ArrayList<InlineKeyboardButton>();
-        firstRow.add(getRefreshButton());
+        final var firstRow  = List.of(getRefreshButton());
+        final var secondRow = List.of(getResetButtont());
 
-        if (specialIds.contains(senderId)) {
-            firstRow.add(getResetButtont());
-        }
+//        final var refresh = getRefreshButton();
+//        final var reset = getResetButtont();
 
         return InlineKeyboardMarkup.builder()
-                            .keyboard(List.of(firstRow))
-                            .build();
+                                   .keyboard(List.of(firstRow, secondRow))
+                                   .build();
     }
 
     private static InlineKeyboardButton getResetButtont() {
