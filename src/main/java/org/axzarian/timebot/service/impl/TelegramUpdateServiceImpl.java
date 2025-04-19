@@ -1,5 +1,6 @@
 package org.axzarian.timebot.service.impl;
 
+import org.axzarian.timebot.model.dto.UserDto;
 import org.axzarian.timebot.service.TelegramUpdateService;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -45,6 +46,31 @@ public class TelegramUpdateServiceImpl implements TelegramUpdateService {
     @Override
     public Long getCallbackSenderId(Update update) {
         return update.getCallbackQuery().getFrom().getId();
+    }
+
+    @Override
+    public String getMessageFromFirstName(Update update) {
+        return update.getMessage().getFrom().getFirstName();
+    }
+
+    @Override
+    public String getMessageFromLastName(Update update) {
+        return update.getMessage().getFrom().getLastName();
+    }
+
+    @Override
+    public String getMessageFromUserName(Update update) {
+        return update.getMessage().getFrom().getUserName();
+    }
+
+    @Override
+    public UserDto getUserDtoFromMessageUpdate(Update update) {
+        return UserDto.builder()
+                      .telegramId(getMessageSenderId(update))
+                      .firstName(getMessageFromFirstName(update))
+                      .lastName(getMessageFromLastName(update))
+                      .userName(getMessageFromUserName(update))
+                      .build();
     }
 
 

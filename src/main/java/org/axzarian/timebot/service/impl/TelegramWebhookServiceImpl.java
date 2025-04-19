@@ -6,6 +6,7 @@ import org.axzarian.timebot.model.domain.Stopwatch;
 import org.axzarian.timebot.sender.TelegramClient;
 import org.axzarian.timebot.service.TelegramUpdateService;
 import org.axzarian.timebot.service.TelegramWebhookService;
+import org.axzarian.timebot.service.UserService;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -17,12 +18,15 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
     private final TelegramUpdateService telegramUpdateService;
     private final TelegramClient        telegramClient;
     private final Stopwatch             stopwatch;
+    private final UserService           userService;
 
 
     @Override
     public void onUpdateEvent(Update update) {
 
         if (telegramUpdateService.hasTextMessage(update)) {
+
+            userService.upsert(telegramUpdateService.getUserDtoFromMessageUpdate(update));
 
             final var chatId   = telegramUpdateService.getMessageChatId(update).toString();
             final var text     = telegramUpdateService.getMessageText(update);
@@ -43,7 +47,9 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
 
             switch (data) {
                 case "refresh" -> telegramClient.editMessage(chatId, messageId, senderId, stopwatch.formatUptime());
-                case "reset" -> { stopwatch.reset(); telegramClient.editMessage(chatId, messageId, senderId, stopwatch.formatUptime());
+                case "reset" -> {
+                    stopwatch.reset();
+                    telegramClient.editMessage(chatId, messageId, senderId, stopwatch.formatUptime());
                 }
             }
 

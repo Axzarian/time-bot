@@ -59,9 +59,6 @@ public class TelegramClient {
         final var firstRow  = List.of(getRefreshButton());
         final var secondRow = List.of(getResetButtont());
 
-//        final var refresh = getRefreshButton();
-//        final var reset = getResetButtont();
-
         return InlineKeyboardMarkup.builder()
                                    .keyboard(List.of(firstRow, secondRow))
                                    .build();

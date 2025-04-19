@@ -1,5 +1,6 @@
 package org.axzarian.timebot.service;
 
+import org.axzarian.timebot.model.dto.UserDto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface TelegramUpdateService {
@@ -19,4 +20,14 @@ public interface TelegramUpdateService {
     Integer getCallbackMessageId(Update update);
 
     Long getCallbackSenderId(Update update);
+
+    String getMessageFromFirstName(Update update);
+
+    String getMessageFromLastName(Update update);
+
+    String getMessageFromUserName(Update update);
+
+    UserDto getUserDtoFromMessageUpdate(Update update);
+
+
 }
