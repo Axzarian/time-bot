@@ -37,6 +37,7 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
         }
 
         if (update.hasCallbackQuery()) {
+
             final var data      = telegramUpdateService.getCallbackData(update);
             final var chatId    = telegramUpdateService.getCallbackChatId(update).toString();
             final var messageId = telegramUpdateService.getCallbackMessageId(update);
