@@ -1,4 +1,4 @@
-package org.axzarian.timebot.entity;
+package org.axzarian.timebot.model.domain;
 
 import org.springframework.stereotype.Component;
 

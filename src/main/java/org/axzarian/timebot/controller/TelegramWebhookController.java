@@ -2,8 +2,9 @@ package org.axzarian.timebot.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.axzarian.timebot.entity.Stopwatch;
+import org.axzarian.timebot.model.domain.Stopwatch;
 import org.axzarian.timebot.sender.TelegramSender;
+import org.axzarian.timebot.service.TelegramWebhookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,19 +18,20 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class TelegramWebhookController {
 
-    private final TelegramSender telegramSender;
-    private final Stopwatch stopwatch;
+    private final TelegramSender         telegramSender;
+    private final Stopwatch              stopwatch;
+    private final TelegramWebhookService webhookService;
 
     private static final String IVAN_ID = "";
-    private static final String MY_ID = "1065966054";
+    private static final String MY_ID   = "1065966054";
 
 
     @PostMapping
     public ResponseEntity<String> onUpdateReceived(@RequestBody Update update) {
 
         /*
-            1. Получаем юзера из Update и если такого нет сохраняем в базу/файлик
-               Можно создать UserService, UserRepo.
+            1. Получаем юзера из Update и если такого нет сохраняем в базу
+               Можно создать UserDao
 
             2. Проверяем что это за юзер если Иван или я то доступны другие кнопки
                UserValidationService
@@ -46,32 +48,34 @@ public class TelegramWebhookController {
 
          */
 
+        webhookService.onUpdateEvent(update);
+
 
         var validUser = true;
 
-        if (update.hasMessage() && update.getMessage().hasText()) {
-
-            validUser = isValidUser(update.getMessage().getFrom().getId());
-
-            if ("/start".equals(update.getMessage().getText())) {
-                log.info("Get update: {}", update);
-            }
-
-            final var text = update.getMessage().getText();
-            final var chatId = update.getMessage().getChatId();
-
-            if ("/time".equals(text) && validUser) {
-                final var message = getMessage();
-                telegramSender.sendWithButtonsForIvan(chatId.toString(), message);
-            } else if ("/time".equals(text)) {
-                final var message = getMessage();
-                telegramSender.sendWithButtons(chatId.toString(), message);
-            }
-        }
+//        if (update.hasMessage() && update.getMessage().hasText()) {
+//
+//            validUser = isValidUser(update.getMessage().getFrom().getId());
+//
+//            if ("/start".equals(telegramUpdateService.getMessageText(update))) {
+//                log.info("Get update: {}", update);
+//            }
+//
+//            final var text   = update.getMessage().getText();
+//            final var chatId = update.getMessage().getChatId();
+//
+//            if ("/time".equals(text) && validUser) {
+//                final var message = getMessage();
+//                telegramSender.sendWithButtonsForIvan(chatId.toString(), message);
+//            } else if ("/time".equals(text)) {
+//                final var message = getMessage();
+//                telegramSender.sendWithButtons(chatId.toString(), message);
+//            }
+//        }
 
         if (update.hasCallbackQuery()) {
-            final var data = update.getCallbackQuery().getData();
-            final var chatId = update.getCallbackQuery().getMessage().getChatId();
+            final var data      = update.getCallbackQuery().getData();
+            final var chatId    = update.getCallbackQuery().getMessage().getChatId();
             final var messageId = update.getCallbackQuery().getMessage().getMessageId();
 
             if ("refresh".equals(data) && validUser) {

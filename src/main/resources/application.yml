@@ -2,6 +2,10 @@ spring:
   application:
     name: time-bot
 
+  datasource:
+    url: jdbc:sqlite:identifier.sqlite
+    driver-class-name: org.sqlite.JDBC
+
 server:
   port: 8090
 
