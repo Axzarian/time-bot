@@ -22,7 +22,7 @@ public class TelegramClient {
     private final RestTemplate       telegramRestTemplate;
     private final TelegramProperties telegramProperties;
 
-    private static final List<String> specialIds = List.of("1065966054");
+    private static final List<String> specialIds = List.of("353453453");
 
     public void sendWithButtons(String chatId, String senderId, String text) {
 
