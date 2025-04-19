@@ -30,7 +30,7 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
 
             switch (text) {
                 case "/start" -> log.info("Update: {}", update);
-                case "/time" -> telegramClient.sendWithButtonsClasses(chatId, stopwatch.formatUptime());
+                case "/time" -> telegramClient.sendWithButtons(chatId, stopwatch.formatUptime());
             }
         }
 
