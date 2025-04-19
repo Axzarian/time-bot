@@ -21,9 +21,8 @@ public class TelegramClient {
     private final RestTemplate       telegramRestTemplate;
     private final TelegramProperties telegramProperties;
 
-    private static final List<String> specialIds = List.of("353453453");
 
-    public void sendWithButtons(String chatId, String senderId, String text) {
+    public void sendWithButtons(String chatId, String text) {
 
         final var markup = getKeyboardMarkup();
         final var payload = TelegramMessageRequest.builder()
@@ -38,7 +37,7 @@ public class TelegramClient {
         telegramRestTemplate.postForObject(url, entity, String.class);
     }
 
-    public void editMessage(String chatId, Integer messageId, String senderId, String newText) {
+    public void editMessage(String chatId, Integer messageId, String newText) {
 
         final var markup = getKeyboardMarkup();
         final var payload = TelegramMessageRequest.builder()

@@ -2,6 +2,7 @@ package org.axzarian.timebot.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.axzarian.timebot.model.domain.SpecialUserChecker;
 import org.axzarian.timebot.model.domain.Stopwatch;
 import org.axzarian.timebot.sender.TelegramClient;
 import org.axzarian.timebot.service.TelegramUpdateService;
@@ -19,6 +20,7 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
     private final TelegramClient        telegramClient;
     private final Stopwatch             stopwatch;
     private final UserService           userService;
+    private final SpecialUserChecker    specialUserChecker;
 
 
     @Override
@@ -30,11 +32,10 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
 
             final var chatId   = telegramUpdateService.getMessageChatId(update).toString();
             final var text     = telegramUpdateService.getMessageText(update);
-            final var senderId = telegramUpdateService.getMessageSenderId(update).toString();
 
             switch (text) {
                 case "/start" -> log.info("Update: {}", update);
-                case "/time" -> telegramClient.sendWithButtons(chatId, senderId, stopwatch.formatUptime());
+                case "/time" -> telegramClient.sendWithButtons(chatId, stopwatch.formatUptime());
             }
         }
 
@@ -46,14 +47,22 @@ public class TelegramWebhookServiceImpl implements TelegramWebhookService {
             final var senderId  = telegramUpdateService.getCallbackSenderId(update).toString();
 
             switch (data) {
-                case "refresh" -> telegramClient.editMessage(chatId, messageId, senderId, stopwatch.formatUptime());
+                case "refresh" -> telegramClient.editMessage(chatId, messageId, stopwatch.formatUptime());
                 case "reset" -> {
-                    stopwatch.reset();
-                    telegramClient.editMessage(chatId, messageId, senderId, stopwatch.formatUptime());
+
+                    var messsage = "Вы не можете обнулить таймер";
+
+                    if (specialUserChecker.isSpecial(senderId)) {
+                        stopwatch.reset();
+                        messsage = stopwatch.formatUptime();
+                        telegramClient.editMessage(chatId, messageId, messsage);
+                        return;
+                    }
+
+                    telegramClient.sendWithButtons(chatId, messsage);
+
                 }
             }
-
         }
-
     }
 }
